@@ -19,7 +19,7 @@ const paymentIntent = await blockus.getPaymentIntent(listingId);
 // Creates permit type data
 const permitTypeData = await getSignERC20Permit(
     buyersAddress,
-    intent,
+    paymentIntent,
     signer
 );
 
@@ -33,7 +33,7 @@ const permitSignature = await signer.signTypedData(
 // Constructs payment transaction
 const paymentMetaTransaction = await buildPaymentTransaction(
     permitSignature,
-    intent,
+    paymentIntent,
     signer
 );
 

@@ -10,8 +10,8 @@ const intent = {
   parameters: {
       paymentTokenAddress: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
       fromAddress: '0x61406EdAa39799EECe2D6567498E0D9C61fef1B6',
-      totalPrice: 1000n,
-      transfers: [['0x26e4D4Fb1Ca8949304e5dc6a776718D754a238e9', 1000n]],
+      totalPrice: 500n,
+      transfers: [['0x42b22630c18A1Ce72DEcc0358cF87020A0247615', 500n]],
       deadline: 115792089237316195423570985008687907853269984665640564039457584007913129639935n,
   },
   contractAddress: '0xA65cc7AF14003464A87294E92FaCD304A61059ac',
