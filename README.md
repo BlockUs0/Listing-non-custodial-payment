@@ -11,9 +11,11 @@ const provider = new ethers.BrowserProvider(window.ethereum);
 const signer = await provider.getSigner();
 const buyersAddress = await signer.getAddress();
 
+// ID of the listing the user is trying to buy
+const listingId = 'arqB2clzH46oehy59eXIc4PNHFKA';
+
 // GETS PAYMENT INTENTION FROM BLOCKUS
 // https://api.blockus.net/api-docs/swagger/index.html#/Marketplace%20listings/getPaymentIntent
-const listingId = 'arqB2clzH46oehy59eXIc4PNHFKA';
 const intent = await blockus.getPaymentIntent(listingId);
 
 // Creates permit type data
