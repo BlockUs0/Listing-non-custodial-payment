@@ -1,4 +1,4 @@
-import { Contract, Interface } from 'ethers';
+import { Contract, ethers } from 'ethers';
 import gelatoAbi from './gelato-abi';
 import { EIP712, IGelatoStruct } from './types';
 
@@ -42,7 +42,7 @@ export async function getGelatoRequestStruct(
     
     let data;
     try {
-        const iface = new Interface([metaTxToSign.func]);
+        const iface = new ethers.utils.Interface([metaTxToSign.func]);
         data = iface.encodeFunctionData(metaTxToSign.functionName, metaTxToSign.parameters);
     } catch (e) {
         console.log(e);
