@@ -7,9 +7,9 @@ This is meant to be soon an SDK, and you will be able to import the needed funct
 We are going to sign two type data objects, one is a USDC permit and the second is a meta transaction that will execute the payment. We first call the get payment intent from blockus API, this will have everything we need to construct they type data objects to be sign.
 
 ```js
-const provider = new ethers.BrowserProvider(window.ethereum);
-const signer = await provider.getSigner();
-const buyersAddress = await signer.getAddress();
+const provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC, 137);
+const signer = new ethers.Wallet(privateKey, provider);
+const buyersAddress = await wallet.getAddress();
 
 // ID of the listing the user is trying to buy
 const listingId = 'arqB2clzH46oehy59eXIc4PNHFKA';
@@ -26,7 +26,7 @@ const permitTypeData = await getSignERC20Permit(
 );
 
 // Get permit signature 
-const permitSignature = await signer.signTypedData(
+const permitSignature = await signer._signTypedData(
     permitTypeData.domain,
     permitTypeData.types,
     permitTypeData.value,
@@ -40,7 +40,7 @@ const paymentMetaTransaction = await buildPaymentTransaction(
 );
 
 // Sign meta transaction for token distribution.
-const distributeTokenSignature = await signer.signTypedData(
+const distributeTokenSignature = await signer._signTypedData(
     paymentMetaTransaction.domain,
     paymentMetaTransaction.types,
     paymentMetaTransaction.value,
@@ -79,7 +79,7 @@ const permitTypeData = await getSignERC20Permit(
     signer
 )
 
-const permitSignature = await signer.signTypedData(
+const permitSignature = await signer._signTypedData(
     permitTypeData.domain,
     permitTypeData.types,
     permitTypeData.value,
@@ -104,19 +104,15 @@ const paymentMetaTransaction:EIP712<IGelatoStruct> = await buildPaymentTransacti
 EtherJS v6 is the only dependency needed, it is used to instantiate Signers, provider objects and generate the required signatures. In the context of the web browser metamask will be both signer and provider.
 
 ```js
-// Web browser
-const provider = new ethers.BrowserProvider(window.ethereum);
-const signer = await provider.getSigner();
-
 // NodeJS
-const provider = new ethers.JsonRpcProvider(process.env.ALCHEMY_RPC, 137);
+const provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC, 137);
 const wallet = new ethers.Wallet(privateKey, provider);
 const buyersAddress = await wallet.getAddress();
 ```
 Signatures will prompt users to sign through a pop up when the signer is metamask or another web base wallet. Objects being sign are Typed structured park of the EIP-712.
 
 ```js
-const signature = await signer.signTypedData(
+const signature = await signer._signTypedData(
     typeData.domain,
     typeData.types,
     typeData.value,
