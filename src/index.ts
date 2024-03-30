@@ -1,5 +1,5 @@
 import { ChainInfo, EIP712, Erc20PermitToSign, IGelatoStruct } from './types';
-import { Signature, TypedDataDomain, ethers } from 'ethers';
+import { TypedDataDomain, ethers } from 'ethers';
 import { getGaslessTxToSign } from './gelato';
 
 export const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -28,7 +28,7 @@ const ERC20_PERMIT_TYPE = {
   ],
 };
 
-const ERC20_PERMIT_ABI_INTERFACE: ethers.InterfaceAbi = [
+const ERC20_PERMIT_ABI_INTERFACE = [
   'function EIP712_VERSION() view returns (string)',
   'function nonces(address) view returns (uint256)',
   'function name() view returns (string)',
@@ -125,7 +125,7 @@ export async function buildPaymentTransaction(
   const chain = paymentIntentResponse.chain;
   const chainId: number = chainInfo[chain].chainId;
 
-  const splitPermitSignature = Signature.from(permitSignature);
+  const splitPermitSignature = ethers.utils.splitSignature(permitSignature);
 
   const permitTransactionParams = [
      splitPermitSignature.v,

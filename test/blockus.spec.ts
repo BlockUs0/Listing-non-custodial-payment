@@ -21,7 +21,7 @@ const intent = {
 
 describe('Payment intention construction', () => {
     it('Complete flow example', async() => {
-      const provider = new ethers.JsonRpcProvider(process.env.ALCHEMY_RPC, 137);
+      const provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC, 137);
       const wallet = new ethers.Wallet(privateKey, provider);
       const buyersAddress = await wallet.getAddress();
 
@@ -35,7 +35,7 @@ describe('Payment intention construction', () => {
       );
 
       // 3. Get permit signature 
-      const permitSignature = await wallet.signTypedData(
+      const permitSignature = await wallet._signTypedData(
         permitTypeData.domain,
         permitTypeData.types,
         permitTypeData.value,
@@ -49,7 +49,7 @@ describe('Payment intention construction', () => {
       );
 
       // Sign meta transaction for token distribution.
-      const distributeTokenSignature = await wallet.signTypedData(
+      const distributeTokenSignature = await wallet._signTypedData(
         paymentMetaTransaction.domain,
         paymentMetaTransaction.types,
         paymentMetaTransaction.value,
@@ -62,7 +62,7 @@ describe('Payment intention construction', () => {
     it('Builds payment meta transaction type data', async () => {
       const permitSig = '0xdd82062cb06d9d81fa0d71d7e5ebdf4f67506d9b270826dcd1ccc1dd83fe5aa17849d6bfeaba01f291d5bfbfba4b358f665b0914c512258edda41e47898793c21b'
 
-      const provider = new ethers.JsonRpcProvider(process.env.ALCHEMY_RPC, 137);
+      const provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC, 137);
       const wallet = new ethers.Wallet(privateKey, provider);
 
       const metaTxtoBeSign = await buildPaymentTransaction(
@@ -77,7 +77,7 @@ describe('Payment intention construction', () => {
     });
 
     it('Creates permit type data', async() => {
-      const provider = new ethers.JsonRpcProvider(process.env.ALCHEMY_RPC, 137);
+      const provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC, 137);
       const wallet = new ethers.Wallet(privateKey, provider);
       const buyersAddress = await wallet.getAddress();
 
