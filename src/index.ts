@@ -3,6 +3,8 @@ import { TypedDataDomain, ethers } from 'ethers';
 import { getGaslessTxToSign } from './gelato';
 
 export const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+export const POLYGON_USDC = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359';
+
 const ERC20_PERMIT_TYPE = {
   Permit: [
       {
@@ -57,7 +59,12 @@ export const getERC2612PermitTypeData = async (
   try {
       version = await contract.EIP712_VERSION();
   } catch (error) {
-      version = '2' ;
+      if (tokenAddress === POLYGON_USDC) {
+        version = '2';
+      } else {
+        version = '1';
+      }
+
   }
 
   const types = ERC20_PERMIT_TYPE;
