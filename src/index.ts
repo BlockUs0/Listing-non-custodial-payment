@@ -59,6 +59,10 @@ export const getERC2612PermitTypeData = async (
   try {
       version = await contract.EIP712_VERSION();
   } catch (error) {
+
+      // DEV: Polygon USDC requires version 2 for EIP712_VERSION 
+      // If using a custom token please make sure it supports permit and set the appropriate version number 
+
       if (tokenAddress === POLYGON_USDC) {
         version = '2';
       } else {
