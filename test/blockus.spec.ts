@@ -6,18 +6,23 @@ import 'dotenv/config'
 
 const privateKey = process.env.PK ?? '';
 const intent = {
-  chain: 'polygon',
-  parameters: {
-      paymentTokenAddress: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
-      fromAddress: '0x61406EdAa39799EECe2D6567498E0D9C61fef1B6',
-      totalPrice: 500n,
-      transfers: [['0x42b22630c18A1Ce72DEcc0358cF87020A0247615', 500n]],
-      deadline: 115792089237316195423570985008687907853269984665640564039457584007913129639935n,
-  },
-  contractAddress: '0xA65cc7AF14003464A87294E92FaCD304A61059ac',
-  functionName: 'distributeTokensWithPermit',
-  functionSignature: 'function distributeTokensWithPermit(address,address,(address,uint256)[],uint256,uint256,uint8,bytes32,bytes32)',
-};
+  "chain": "polygon",
+  "contractAddress": "0xA65cc7AF14003464A87294E92FaCD304A61059ac",
+  "functionName": "distributeTokensWithPermit",
+  "functionSignature": "function distributeTokensWithPermit(address,address,(address,uint256)[],uint256,uint256,uint8,bytes32,bytes32)",
+  "parameters": {
+      "paymentTokenAddress": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+      "fromAddress": "0x61406EdAa39799EECe2D6567498E0D9C61fef1B6",
+      "transfers": [
+          [
+              "0x90b710825db8AAb007B6Bd9F15894e61F8f3c77c",
+              "1000"
+          ]
+      ],
+      "totalPrice": "1000",
+      "deadline": ethers.constants.MaxUint256
+  }
+}
 
 describe('Payment intention construction', () => {
     it('Complete flow example', async() => {
@@ -26,7 +31,6 @@ describe('Payment intention construction', () => {
       const buyersAddress = await wallet.getAddress();
 
       // 1. GETS PAYMENT INTENTION FROM BLOCKUS 
-
       // 2. Creates permit type data
       const permitTypeData = await getSignERC20Permit(
         buyersAddress,
@@ -56,6 +60,7 @@ describe('Payment intention construction', () => {
       );
 
       const metaTxDeadline = paymentMetaTransaction.value.userDeadline;
+
       console.log({ distributeTokenSignature, permitSignature, metaTxDeadline });
     });
 
