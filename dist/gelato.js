@@ -1,27 +1,17 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getGaslessTxToSign = exports.getGelatoRequestStruct = exports.EIP712_SPONSORED_CALL_ERC2771_TYPE_DATA = exports.GELATO_RELAY_ADDRESS = exports.gelatoEIP712DomainTypeData = void 0;
+exports.getGaslessTxToSign = exports.getGelatoRequestStruct = exports.DEFAULT_DEADLINE_GAP = exports.EIP712_SPONSORED_CALL_ERC2771_TYPE_DATA = exports.GELATO_RELAY_ADDRESS = exports.gelatoEIP712DomainTypeData = void 0;
 const ethers_1 = require("ethers");
 const gelato_abi_1 = __importDefault(require("./gelato-abi"));
-const utils_1 = require("ethers/lib/utils");
 function gelatoEIP712DomainTypeData(chain) {
     return {
         name: 'GelatoRelay1BalanceERC2771',
         version: '1',
         verifyingContract: exports.GELATO_RELAY_ADDRESS,
-        chain,
+        chainId: chain,
     };
 }
 exports.gelatoEIP712DomainTypeData = gelatoEIP712DomainTypeData;
@@ -36,37 +26,39 @@ exports.EIP712_SPONSORED_CALL_ERC2771_TYPE_DATA = {
         { name: 'userDeadline', type: 'uint256' },
     ],
 };
-function getGelatoRequestStruct(provider, chainId, target, metaTxToSign, deadline) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const signerAddress = yield provider.getAddress();
-        const relayerAddress = exports.GELATO_RELAY_ADDRESS;
-        const gelatoRelayerContract = new ethers_1.Contract(relayerAddress, gelato_abi_1.default);
-        const contract = gelatoRelayerContract.connect(provider);
-        const userNonce = ethers_1.BigNumber.from(yield contract.userNonce(yield provider.getAddress()));
-        let data;
-        try {
-            const iface = new utils_1.Interface([metaTxToSign.func]);
-            data = iface.encodeFunctionData(metaTxToSign.functionName, metaTxToSign.parameters);
-        }
-        catch (e) {
-            console.log(e);
-            throw new Error('could not create data');
-        }
-        const gelatoRequestStruct = {
-            chainId,
-            target: target,
-            data: data,
-            user: signerAddress,
-            userNonce: userNonce.toNumber(),
-            userDeadline: deadline,
-        };
-        return gelatoRequestStruct;
-    });
+exports.DEFAULT_DEADLINE_GAP = 86400;
+async function getGelatoRequestStruct(provider, chainId, target, metaTxToSign, deadline) {
+    const signerAddress = await provider.getAddress();
+    const relayerAddress = exports.GELATO_RELAY_ADDRESS;
+    const gelatoRelayerContract = new ethers_1.Contract(relayerAddress, gelato_abi_1.default);
+    const contract = gelatoRelayerContract.connect(provider);
+    const userNonce = await contract.userNonce(await provider.getAddress());
+    let data;
+    try {
+        const iface = new ethers_1.ethers.utils.Interface([metaTxToSign.func]);
+        data = iface.encodeFunctionData(metaTxToSign.functionName, metaTxToSign.parameters);
+    }
+    catch (e) {
+        console.log(e);
+        throw new Error('could not create data');
+    }
+    const gelatoRequestStruct = {
+        chainId,
+        target: target,
+        data: data,
+        user: signerAddress,
+        userNonce: Number(userNonce),
+        userDeadline: deadline ?? calculateDeadline(exports.DEFAULT_DEADLINE_GAP),
+    };
+    return gelatoRequestStruct;
 }
 exports.getGelatoRequestStruct = getGelatoRequestStruct;
-exports.getGaslessTxToSign = (chain, contractAddress, provider, metaTxToSign, deadline) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getGaslessTxToSign = async (chain, contractAddress, provider, metaTxToSign, deadline) => {
     const domain = gelatoEIP712DomainTypeData(chain);
-    const types = Object.assign({}, exports.EIP712_SPONSORED_CALL_ERC2771_TYPE_DATA);
-    const value = yield getGelatoRequestStruct(provider, chain, contractAddress, metaTxToSign, deadline);
+    const types = { ...exports.EIP712_SPONSORED_CALL_ERC2771_TYPE_DATA };
+    const value = await getGelatoRequestStruct(provider, chain, contractAddress, metaTxToSign, deadline);
     return { domain, types, value };
-});
+};
+function calculateDeadline(gap) {
+    return Math.floor(Date.now() / 1000) + gap;
+}
