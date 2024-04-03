@@ -7,4 +7,3 @@ exports.EIP712Domain = [
     { name: "chainId", type: "uint256" },
     { name: "verifyingContract", type: "address" },
 ];
-//# sourceMappingURL=types.js.map

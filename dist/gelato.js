@@ -62,4 +62,3 @@ exports.getGaslessTxToSign = async (chain, contractAddress, provider, metaTxToSi
 function calculateDeadline(gap) {
     return Math.floor(Date.now() / 1000) + gap;
 }
-//# sourceMappingURL=gelato.js.map

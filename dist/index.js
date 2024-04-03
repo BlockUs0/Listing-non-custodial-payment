@@ -125,4 +125,3 @@ const chainInfo = {
         chainId: 137
     }
 };
-//# sourceMappingURL=index.js.map

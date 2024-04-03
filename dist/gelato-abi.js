@@ -138,4 +138,3 @@ exports.default = [
         type: 'function',
     },
 ];
-//# sourceMappingURL=gelato-abi.js.map
