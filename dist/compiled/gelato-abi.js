@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = [
+export default [
     {
         inputs: [{ internalType: 'address', name: '_gelato', type: 'address' }],
         stateMutability: 'nonpayable',
@@ -138,4 +136,3 @@ exports.default = [
         type: 'function',
     },
 ];
-//# sourceMappingURL=gelato-abi.js.map

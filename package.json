@@ -14,8 +14,8 @@
     "url": "https://github.com/BlockUs0/signatures-type-data"
   },
   "scripts": {
-    "build": "tsc",
-    "test": "mocha -r ts-node/register test/\\*\\*/\\*.spec.ts --timeout 10000"
+    "test": "mocha -r ts-node/register test/\\*\\*/\\*.spec.ts --timeout 10000",
+    "build": "rimraf dist && tsc && rollup -c rollup.config.js --bundleConfigAsCjs"
   },
   "devDependencies": {
     "@openzeppelin/test-environment": "^0.1.4",
@@ -25,10 +25,13 @@
     "chai": "^4.2.0",
     "ethers": "5.7",
     "mocha": "^8.1.1",
+    "rollup": "^4.14.1",
+    "rollup-plugin-typescript2": "^0.36.0",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7"
   },
   "dependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
     "add": "^2.0.6",
     "dotenv": "^16.4.5",
     "utf8": "^3.0.0",

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "./dist",
+    "outDir": "./dist/compiled",
     "target": "es2020",
     "lib": [
       "es2020",
@@ -12,9 +12,9 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "commonjs",
+    "module": "es2020",
     "moduleResolution": "node",
-    "isolatedModules": true
+    "isolatedModules": true,
   },
   "include": [
     "src"
