@@ -171,6 +171,39 @@ export async function buildPaymentTransaction(
   );
 }
 
+export async function getPaymentTransactionSignatureData(wallet: ethers.Wallet, intent: any) {
+  const buyersAddress = await wallet.getAddress();
+
+  const permitTypeData = await getSignERC20Permit(
+    buyersAddress,
+    intent,
+    wallet
+  );
+
+  const permitTxSignature = await wallet._signTypedData(
+    permitTypeData.domain,
+    permitTypeData.types,
+    permitTypeData.value,
+  );
+
+  const paymentMetaTransaction:EIP712<IGelatoStruct> = await buildPaymentTransaction(
+    permitTxSignature,
+    intent,
+    wallet
+  );
+
+  // Sign meta transaction for token distribution.
+  const paymentTxSignature = await wallet._signTypedData(
+    paymentMetaTransaction.domain,
+    paymentMetaTransaction.types,
+    paymentMetaTransaction.value,
+  );
+
+  const metaTransactionDeadline = paymentMetaTransaction.value.userDeadline;
+
+  return { paymentTxSignature, permitTxSignature, metaTransactionDeadline };
+}
+
 const chainInfo: ChainInfo = {
   'polygon': {
     chainId: 137

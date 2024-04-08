@@ -18,44 +18,19 @@ const listingId = 'arqB2clzH46oehy59eXIc4PNHFKA';
 // https://api.blockus.net/api-docs/swagger/index.html#/Marketplace%20listings/getPaymentIntent
 const intent = await blockus.getPaymentIntent(listingId);
 
-// Creates permit type data
-const permitTypeData = await getSignERC20Permit(
-    buyersAddress,
-    paymentIntent,
-    signer
-);
-
-// Get permit signature 
-const permitSignature = await signer._signTypedData(
-    permitTypeData.domain,
-    permitTypeData.types,
-    permitTypeData.value,
-);      
-
-// Constructs payment transaction
-const paymentMetaTransaction = await buildPaymentTransaction(
-    permitSignature,
-    paymentIntent,
-    signer
-);
-
-// Sign meta transaction for token distribution.
-const distributeTokenSignature = await signer._signTypedData(
-    paymentMetaTransaction.domain,
-    paymentMetaTransaction.types,
-    paymentMetaTransaction.value,
-);
-
-// Meta transaction deadline
-const metaTxDeadline = paymentMetaTransaction.value.userDeadline;
+const {
+    paymentTxSignature,
+    permitTxSignature,
+    metaTransactionDeadline
+} = await getPaymentTransactionSignatureData(signer, intent);
 
 // Execute listing
 const executeBody = {
     "paymentWalletChain": "polygon",
     "paymentWalletAddress": buyersAddress,
-    "paymentTxSignature": distributeTokenSignature,
-    "permitTxSignature": permitSignature,
-    "metaTransactionDeadline": metaTxDeadline
+    "paymentTxSignature": paymentTxSignature,
+    "permitTxSignature": permitTxSignature,
+    "metaTransactionDeadline": metaTransactionDeadline
 }
 
 // https://api.blockus.net/api-docs/swagger/index.html#/Marketplace%20listings/executeListing

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildPaymentTransaction = exports.getSignERC20Permit = exports.getERC2612PermitTypeData = exports.POLYGON_USDC = exports.MAX_INT = void 0;
+exports.getPaymentTransactionSignatureData = exports.buildPaymentTransaction = exports.getSignERC20Permit = exports.getERC2612PermitTypeData = exports.POLYGON_USDC = exports.MAX_INT = void 0;
 const ethers_1 = require("ethers");
 const gelato_1 = require("./gelato");
 exports.MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -120,6 +120,17 @@ async function buildPaymentTransaction(permitSignature, paymentIntentResponse, p
     return gelato_1.getGaslessTxToSign(chainId, contractAddress, provider, functionCall);
 }
 exports.buildPaymentTransaction = buildPaymentTransaction;
+async function getPaymentTransactionSignatureData(wallet, intent) {
+    const buyersAddress = await wallet.getAddress();
+    const permitTypeData = await getSignERC20Permit(buyersAddress, intent, wallet);
+    const permitTxSignature = await wallet._signTypedData(permitTypeData.domain, permitTypeData.types, permitTypeData.value);
+    const paymentMetaTransaction = await buildPaymentTransaction(permitTxSignature, intent, wallet);
+    // Sign meta transaction for token distribution.
+    const paymentTxSignature = await wallet._signTypedData(paymentMetaTransaction.domain, paymentMetaTransaction.types, paymentMetaTransaction.value);
+    const metaTransactionDeadline = paymentMetaTransaction.value.userDeadline;
+    return { paymentTxSignature, permitTxSignature, metaTransactionDeadline };
+}
+exports.getPaymentTransactionSignatureData = getPaymentTransactionSignatureData;
 const chainInfo = {
     'polygon': {
         chainId: 137

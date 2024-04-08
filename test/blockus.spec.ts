@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { MAX_INT, buildPaymentTransaction, getSignERC20Permit } from '../src';
+import { MAX_INT, buildPaymentTransaction, getPaymentTransactionSignatureData, getSignERC20Permit } from '../src';
 import { expect } from 'chai';
 import { EIP712, IGelatoStruct } from '../src/types';
 import 'dotenv/config'
@@ -12,7 +12,7 @@ const intent = {
   "functionSignature": "function distributeTokensWithPermit(address,address,(address,uint256)[],uint256,uint256,uint8,bytes32,bytes32)",
   "parameters": {
       "paymentTokenAddress": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-      "fromAddress": "0x61406EdAa39799EECe2D6567498E0D9C61fef1B6",
+      "fromAddress": "0xb1f8462b320024c33033dD092966BA38DBb8543a",
       "transfers": [
           [
               "0x90b710825db8AAb007B6Bd9F15894e61F8f3c77c",
@@ -25,7 +25,7 @@ const intent = {
 }
 
 describe('Payment intention construction', () => {
-    it('Complete flow example', async() => {
+    it('Complete flow example', async () => {
       const provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC, 137);
       const wallet = new ethers.Wallet(privateKey, provider);
       const buyersAddress = await wallet.getAddress();
@@ -61,7 +61,21 @@ describe('Payment intention construction', () => {
 
       const metaTxDeadline = paymentMetaTransaction.value.userDeadline;
 
-      console.log({ distributeTokenSignature, permitSignature, metaTxDeadline });
+      expect(metaTxDeadline).to.be.a('number');
+      expect(permitSignature).to.be.a('string');
+      expect(distributeTokenSignature).to.be.a('string');
+    });
+
+    it('getPaymentTransactionSignatureData', async () => {
+      const provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC, 137);
+      const wallet = new ethers.Wallet(privateKey, provider);
+      const { paymentTxSignature, permitTxSignature, metaTransactionDeadline } = await getPaymentTransactionSignatureData(wallet, intent);
+
+      expect(metaTransactionDeadline).to.be.a('number');
+      expect(permitTxSignature).to.be.a('string');
+      expect(paymentTxSignature).to.be.a('string');
+
+      console.log({ paymentTxSignature, permitTxSignature, metaTransactionDeadline });
     });
 
     it('Builds payment meta transaction type data', async () => {
@@ -96,6 +110,5 @@ describe('Payment intention construction', () => {
       expect(permitTypeData).to.haveOwnProperty('types')
       expect(permitTypeData).to.haveOwnProperty('value')
     });
-
 });
 
