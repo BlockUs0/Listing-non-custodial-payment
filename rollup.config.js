@@ -11,7 +11,9 @@ export default {
   },
   plugins: [
     typescript(), // Use rollup-plugin-typescript2 to handle TypeScript files
-    resolve(),
+    resolve({
+      browser: true
+    }),
   ],
   external: [
     'bn.js',
